@@ -79,11 +79,14 @@ def send_scheduled_verses():
                     
     except Exception as e:
         print(f"Error in send_scheduled_verses: {e}")
+        import traceback
+        traceback.print_exc()
 
 def main():
     """Main scheduler loop"""
     print("📅 Bible Verse Scheduler started")
     print("Checking for scheduled verses every minute...")
+    print("⚠️  For production, consider using a cron job that runs at specific times instead of continuous polling")
     
     # Schedule the check to run every minute
     schedule.every(1).minutes.do(send_scheduled_verses)

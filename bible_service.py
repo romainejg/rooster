@@ -43,36 +43,40 @@ class BibleVerseService:
     
     def _fetch_from_api(self, book: str, chapter: int, start_verse: int, end_verse: int) -> Optional[str]:
         """Fetch from API.Bible"""
-        # Convert book name to Bible book ID (simplified mapping)
-        book_id = self._get_book_id(book)
-        if not book_id:
-            return None
+        try:
+            # Convert book name to Bible book ID (simplified mapping)
+            book_id = self._get_book_id(book)
+            if not book_id:
+                return None
+                
+            # Build passage reference
+            if start_verse == end_verse:
+                passage_id = f"{book_id}.{chapter}.{start_verse}"
+            else:
+                passage_id = f"{book_id}.{chapter}.{start_verse}-{book_id}.{chapter}.{end_verse}"
             
-        # Build passage reference
-        if start_verse == end_verse:
-            passage_id = f"{book_id}.{chapter}.{start_verse}"
-        else:
-            passage_id = f"{book_id}.{chapter}.{start_verse}-{book_id}.{chapter}.{end_verse}"
-        
-        headers = {
-            'api-key': self.api_key
-        }
-        
-        url = f"{self.base_url}/bibles/{self.bible_id}/passages/{passage_id}"
-        params = {
-            'content-type': 'text',
-            'include-notes': 'false',
-            'include-titles': 'false',
-            'include-chapter-numbers': 'false',
-            'include-verse-numbers': 'true'
-        }
-        
-        response = requests.get(url, headers=headers, params=params, timeout=10)
-        
-        if response.status_code == 200:
-            data = response.json()
-            return data.get('data', {}).get('content', '')
-        return None
+            headers = {
+                'api-key': self.api_key
+            }
+            
+            url = f"{self.base_url}/bibles/{self.bible_id}/passages/{passage_id}"
+            params = {
+                'content-type': 'text',
+                'include-notes': 'false',
+                'include-titles': 'false',
+                'include-chapter-numbers': 'false',
+                'include-verse-numbers': 'true'
+            }
+            
+            response = requests.get(url, headers=headers, params=params, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                return data.get('data', {}).get('content', '')
+            return None
+        except requests.RequestException as e:
+            print(f"Network error fetching verse: {e}")
+            return None
     
     def _fetch_fallback(self, book: str, chapter: int, start_verse: int, end_verse: int) -> str:
         """Fallback when API is not available - return formatted reference"""

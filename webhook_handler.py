@@ -15,8 +15,15 @@ try:
     twilio_service = TwilioService()
     openai_service = OpenAIService()
     conversation_store = ConversationStore()
+except ValueError as e:
+    print(f"Configuration error: {e}")
+    twilio_service = None
+    openai_service = None
+    conversation_store = None
 except Exception as e:
-    print(f"Error initializing services: {e}")
+    print(f"Unexpected error initializing services: {e}")
+    import traceback
+    traceback.print_exc()
     twilio_service = None
     openai_service = None
     conversation_store = None
