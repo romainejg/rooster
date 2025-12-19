@@ -1,11 +1,12 @@
 # Streamlit Configuration
 
 [theme]
-primaryColor = "#4CAF50"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F5F5F5"
-textColor = "#262730"
-font = "sans serif"
+# Inspirational churchy theme with warm, peaceful colors
+primaryColor = "#8B6914"  # Golden/bronze for spiritual richness
+backgroundColor = "#FFF8E7"  # Warm cream/parchment background
+secondaryBackgroundColor = "rgba(139, 105, 20, 0.08)"  # Semi-transparent golden tint
+textColor = "#2C1810"  # Deep brown for readability
+font = "serif"  # Traditional serif font for biblical feel
 
 [server]
 headless = true
