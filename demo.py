@@ -85,6 +85,31 @@ def demo_conversation_store():
     for msg in openai_history[:2]:
         print(f"   Role: {msg['role']}, Content: {msg['content'][:40]}...")
     
+    # Demonstrate state persistence (NEW FEATURE)
+    print("\n💾 Testing state persistence:")
+    print("   Saving verse selection state...")
+    store.save_verse_selection(
+        book="Romans",
+        chapter=8,
+        start_verse=28,
+        end_verse=28,
+        preview_message="📖 Romans 8:28\n\nAnd we know that in all things God works for the good...",
+        verse_ref="Romans 8:28"
+    )
+    store.save_recipient_number(phone)
+    
+    # Retrieve state
+    saved_selection = store.get_verse_selection()
+    saved_recipient = store.get_recipient_number()
+    
+    # Display saved state (handle None values)
+    book = saved_selection.get('book') or 'N/A'
+    chapter = saved_selection.get('chapter', 0)
+    start_verse = saved_selection.get('start_verse', 0)
+    print(f"   ✅ State saved: {book} {chapter}:{start_verse}")
+    print(f"   ✅ Recipient saved: {saved_recipient}")
+    print(f"   ℹ️  State persists across app restarts!")
+    
     # Demonstrate scheduling
     print("\n📅 Adding scheduled messages:")
     schedules = [

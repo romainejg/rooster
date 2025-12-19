@@ -36,6 +36,13 @@ A complete Streamlit-based application for sending daily Bible verses via Twilio
 - **OpenAI Format**: Automatic conversion for AI context
 - **Test Interface**: Try Q&A responses without sending SMS
 
+### 6. Persistent Memory (New Feature)
+- **State Persistence**: Remembers last verse selection across app restarts
+- **Preview Restoration**: Restores previewed messages when returning to app
+- **Recipient Memory**: Saves and restores recipient phone number
+- **Seamless UX**: Users can exit and return without losing their work
+- **SQLite-based**: Uses database for reliable state storage
+
 ## 📦 Architecture
 
 ### Core Components
@@ -219,6 +226,11 @@ BIBLE_API_KEY           # Optional: API.Bible key
 
 **scheduled_messages table**
 - id, book, chapter, start_verse, end_verse, schedule_time, include_reflection, recipient_number, status, created_at
+
+**user_state table** (New - Persistent Memory Feature)
+- id, key, value, updated_at
+- Stores UI state for persistence across app restarts
+- Keys include: last_book, last_chapter, last_start_verse, last_end_verse, preview_message, current_verse_ref, recipient_number
 
 ## 🔧 Technologies Used
 

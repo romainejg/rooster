@@ -59,12 +59,20 @@ with st.sidebar:
     else:
         st.error("❌ Twilio not configured")
     
+    # Get saved recipient number with fallback to env variable
+    saved_recipient = conversation_store.get_recipient_number() if conversation_store else None
+    default_recipient = os.getenv('RECIPIENT_PHONE_NUMBER', saved_recipient or '')
+    
     recipient_number = st.text_input(
         "Recipient Phone Number",
-        value=os.getenv('RECIPIENT_PHONE_NUMBER', ''),
+        value=default_recipient,
         placeholder="+1234567890",
         help="Phone number to send Bible verses to"
     )
+    
+    # Save recipient number when it changes (only if non-empty and different)
+    if recipient_number and conversation_store and recipient_number != saved_recipient and recipient_number != default_recipient:
+        conversation_store.save_recipient_number(recipient_number)
     
     st.markdown("---")
     st.markdown("### About")
@@ -80,6 +88,9 @@ with st.sidebar:
 if not all([bible_service, openai_service, twilio_service, conversation_store]):
     st.stop()
 
+# Restore last verse selection from persistent storage
+last_selection = conversation_store.get_verse_selection()
+
 # Main interface tabs
 tab1, tab2, tab3, tab4 = st.tabs(["📤 Send Verse", "📅 Schedule", "💬 Conversations", "ℹ️ Setup"])
 
@@ -90,18 +101,23 @@ with tab1:
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        # Book selection
+        # Book selection with restoration of last selection
         books = bible_service.get_book_list()
-        selected_book = st.selectbox("Select Book", books, index=books.index("John") if "John" in books else 0)
         
-        # Chapter and verse selection
+        # Determine default book index
+        default_book = last_selection.get('book') or "John"
+        default_book_index = books.index(default_book) if default_book in books else (books.index("John") if "John" in books else 0)
+        
+        selected_book = st.selectbox("Select Book", books, index=default_book_index)
+        
+        # Chapter and verse selection with restoration
         col_ch, col_v1, col_v2 = st.columns(3)
         with col_ch:
-            chapter = st.number_input("Chapter", min_value=1, max_value=150, value=3)
+            chapter = st.number_input("Chapter", min_value=1, max_value=150, value=last_selection.get('chapter', 3))
         with col_v1:
-            start_verse = st.number_input("Start Verse", min_value=1, max_value=176, value=16)
+            start_verse = st.number_input("Start Verse", min_value=1, max_value=176, value=last_selection.get('start_verse', 16))
         with col_v2:
-            end_verse = st.number_input("End Verse", min_value=1, max_value=176, value=16)
+            end_verse = st.number_input("End Verse", min_value=1, max_value=176, value=last_selection.get('end_verse', 16))
         
         # Options
         include_reflection = st.checkbox("Include AI-generated reflection", value=True)
@@ -126,10 +142,26 @@ with tab1:
                     verse_text, verse_ref, include_reflection
                 )
                 
+                # Save to both session state and persistent storage
                 st.session_state.preview_message = formatted_message
                 st.session_state.current_verse_ref = verse_ref
+                
+                # Save to persistent storage so it survives app restarts
+                conversation_store.save_verse_selection(
+                    book=selected_book,
+                    chapter=chapter,
+                    start_verse=start_verse,
+                    end_verse=end_verse,
+                    preview_message=formatted_message,
+                    verse_ref=verse_ref
+                )
             else:
                 st.error("Could not fetch verse. Please check the reference.")
+    
+    # Initialize session state from persistent storage if not already set
+    if 'preview_message' not in st.session_state and last_selection.get('preview_message'):
+        st.session_state.preview_message = last_selection['preview_message']
+        st.session_state.current_verse_ref = last_selection.get('current_verse_ref', '')
     
     # Display preview
     if 'preview_message' in st.session_state:
