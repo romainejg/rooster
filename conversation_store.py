@@ -45,6 +45,16 @@ class ConversationStore:
             )
         ''')
         
+        # Create user_state table for persisting UI state
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS user_state (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                key TEXT NOT NULL UNIQUE,
+                value TEXT,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
         conn.commit()
         conn.close()
     
@@ -195,3 +205,105 @@ class ConversationStore:
         
         conn.commit()
         conn.close()
+    
+    def save_state(self, key: str, value: str):
+        """
+        Save a state value to persistent storage
+        
+        Args:
+            key: The state key (e.g., 'last_book', 'preview_message')
+            value: The value to store (will be converted to string)
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT INTO user_state (key, value, updated_at)
+            VALUES (?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(key) DO UPDATE SET 
+                value = excluded.value,
+                updated_at = CURRENT_TIMESTAMP
+        ''', (key, value))
+        
+        conn.commit()
+        conn.close()
+    
+    def get_state(self, key: str, default: Optional[str] = None) -> Optional[str]:
+        """
+        Retrieve a state value from persistent storage
+        
+        Args:
+            key: The state key to retrieve
+            default: Default value if key doesn't exist
+        
+        Returns:
+            The stored value or default if not found
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT value FROM user_state WHERE key = ?', (key,))
+        row = cursor.fetchone()
+        
+        conn.close()
+        
+        return row[0] if row else default
+    
+    def save_verse_selection(self, book: str, chapter: int, start_verse: int, 
+                           end_verse: int, preview_message: Optional[str] = None,
+                           verse_ref: Optional[str] = None):
+        """
+        Save the last verse selection for persistence across sessions
+        
+        Args:
+            book: Bible book name
+            chapter: Chapter number
+            start_verse: Starting verse number
+            end_verse: Ending verse number
+            preview_message: Optional preview message text
+            verse_ref: Optional verse reference string
+        """
+        self.save_state('last_book', book)
+        self.save_state('last_chapter', str(chapter))
+        self.save_state('last_start_verse', str(start_verse))
+        self.save_state('last_end_verse', str(end_verse))
+        
+        if preview_message:
+            self.save_state('preview_message', preview_message)
+        
+        if verse_ref:
+            self.save_state('current_verse_ref', verse_ref)
+    
+    def get_verse_selection(self) -> Dict:
+        """
+        Retrieve the last verse selection
+        
+        Returns:
+            Dictionary with last verse selection or defaults
+        """
+        return {
+            'book': self.get_state('last_book'),
+            'chapter': int(self.get_state('last_chapter', '3')),
+            'start_verse': int(self.get_state('last_start_verse', '16')),
+            'end_verse': int(self.get_state('last_end_verse', '16')),
+            'preview_message': self.get_state('preview_message'),
+            'current_verse_ref': self.get_state('current_verse_ref')
+        }
+    
+    def save_recipient_number(self, phone_number: str):
+        """
+        Save the recipient phone number
+        
+        Args:
+            phone_number: The phone number to save
+        """
+        self.save_state('recipient_number', phone_number)
+    
+    def get_recipient_number(self) -> Optional[str]:
+        """
+        Retrieve the saved recipient phone number
+        
+        Returns:
+            The saved phone number or None
+        """
+        return self.get_state('recipient_number')
