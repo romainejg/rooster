@@ -1,5 +1,5 @@
 """
-Twilio SMS service for sending and receiving messages
+Twilio SMS/WhatsApp service for sending and receiving messages
 """
 import os
 from typing import Optional, Dict
@@ -24,9 +24,29 @@ class TwilioService:
         if not self.from_number:
             raise ValueError("TWILIO_PHONE_NUMBER must be set in environment variables")
     
+    def _format_whatsapp_number(self, phone_number: str) -> str:
+        """
+        Format phone number for WhatsApp if not already formatted.
+        
+        Args:
+            phone_number: Phone number (e.g., '+1234567890' or 'whatsapp:+1234567890')
+        
+        Returns:
+            WhatsApp-formatted number (e.g., 'whatsapp:+1234567890')
+        """
+        if not phone_number:
+            return phone_number
+        
+        # If already prefixed with 'whatsapp:', return as is
+        if phone_number.startswith('whatsapp:'):
+            return phone_number
+        
+        # Add 'whatsapp:' prefix
+        return f'whatsapp:{phone_number}'
+    
     def send_sms(self, message: str, to_number: Optional[str] = None) -> Dict[str, str]:
         """
-        Send an SMS message via Twilio
+        Send a WhatsApp message via Twilio
         
         Args:
             message: The message text to send
@@ -44,16 +64,20 @@ class TwilioService:
             }
         
         try:
+            # Format numbers for WhatsApp
+            from_whatsapp = self._format_whatsapp_number(self.from_number)
+            to_whatsapp = self._format_whatsapp_number(recipient)
+            
             message_obj = self.client.messages.create(
                 body=message,
-                from_=self.from_number,
-                to=recipient
+                from_=from_whatsapp,
+                to=to_whatsapp
             )
             
             return {
                 'status': 'success',
                 'message_sid': message_obj.sid,
-                'to': recipient
+                'to': to_whatsapp
             }
         except Exception as e:
             return {

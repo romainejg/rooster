@@ -1,8 +1,8 @@
-# Rooster - Bible Verse SMS Implementation Summary
+# Rooster - Bible Verse WhatsApp Implementation Summary
 
 ## ✅ Completed Implementation
 
-A complete Streamlit-based application for sending daily Bible verses via Twilio SMS with OpenAI-powered reflections and two-way Q&A functionality.
+A complete Streamlit-based application for sending daily Bible verses via Twilio WhatsApp with OpenAI-powered reflections and two-way Q&A functionality.
 
 ## 🎯 Core Features Delivered
 
@@ -10,13 +10,13 @@ A complete Streamlit-based application for sending daily Bible verses via Twilio
 - **Interactive UI**: Streamlit interface for selecting any Bible book, chapter, and verse range
 - **42 Bible Books**: Support for major Old and New Testament books
 - **API Integration**: API.Bible integration with intelligent fallback
-- **Immediate Sending**: Send verses instantly via Twilio SMS
+- **Immediate Sending**: Send verses instantly via Twilio WhatsApp
 
 ### 2. AI-Powered Reflections
 - **OpenAI Integration**: GPT-4 generates meaningful, contextual reflections
 - **Customizable**: Format verses with or without AI-generated devotional content
-- **SMS Optimized**: Messages formatted for mobile delivery
-- **Character Counter**: Shows SMS segment count (160 char threshold)
+- **WhatsApp Optimized**: Messages formatted for WhatsApp delivery
+- **Character Counter**: Shows message segment count (160 char threshold)
 
 ### 3. Message Scheduling
 - **Daily Scheduling**: Set specific times for automated verse delivery
@@ -24,17 +24,18 @@ A complete Streamlit-based application for sending daily Bible verses via Twilio
 - **Reflection Toggle**: Choose whether to include AI reflections per schedule
 - **Management UI**: View and delete scheduled messages
 
-### 4. Two-Way SMS Communication
-- **Webhook Handler**: Flask-based endpoint for incoming SMS
+### 4. Two-Way WhatsApp Communication
+- **Webhook Handler**: Flask-based endpoint for incoming WhatsApp messages
 - **AI Q&A**: OpenAI answers questions based on church doctrine
 - **Context Aware**: Maintains conversation history for relevant responses
 - **Customizable Doctrine**: Configurable theological perspective
+- **Auto-formatting**: Phone numbers automatically formatted for WhatsApp (whatsapp:+1234567890)
 
 ### 5. Conversation Tracking
 - **SQLite Storage**: Persistent storage of all messages and schedules
 - **History View**: See sent and received messages in UI
 - **OpenAI Format**: Automatic conversion for AI context
-- **Test Interface**: Try Q&A responses without sending SMS
+- **Test Interface**: Try Q&A responses without sending WhatsApp messages
 
 ### 6. Persistent Memory (New Feature)
 - **State Persistence**: Remembers last verse selection across app restarts
@@ -51,9 +52,9 @@ rooster/
 ├── app.py                    # Streamlit UI (4 tabs: Send, Schedule, Conversations, Setup)
 ├── bible_service.py          # Bible verse fetching with API.Bible
 ├── openai_service.py         # AI formatting and Q&A
-├── twilio_service.py         # SMS sending and webhook responses
+├── twilio_service.py         # WhatsApp sending and webhook responses
 ├── conversation_store.py     # SQLite database management
-├── webhook_handler.py        # Flask webhook for SMS replies
+├── webhook_handler.py        # Flask webhook for WhatsApp replies
 ├── scheduler.py              # Background process for scheduled sending
 └── demo.py                   # Comprehensive demo script
 ```
@@ -130,11 +131,13 @@ rooster/
 OPENAI_API_KEY          # OpenAI API key
 TWILIO_ACCOUNT_SID      # Twilio credentials
 TWILIO_AUTH_TOKEN       # Twilio credentials
-TWILIO_PHONE_NUMBER     # Your Twilio number
-RECIPIENT_PHONE_NUMBER  # Default recipient
+TWILIO_PHONE_NUMBER     # Your Twilio WhatsApp-enabled number
+RECIPIENT_PHONE_NUMBER  # Default recipient WhatsApp number
 CHURCH_DOCTRINE         # Theological perspective
 BIBLE_API_KEY           # Optional: API.Bible key
 ```
+
+**Note:** Phone numbers are automatically formatted for WhatsApp (e.g., `+1234567890` → `whatsapp:+1234567890`)
 
 ## 📚 Documentation
 

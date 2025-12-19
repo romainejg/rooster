@@ -1,5 +1,5 @@
 """
-Webhook handler for Twilio SMS replies
+Webhook handler for Twilio WhatsApp replies
 Run this as a separate Flask app or integrate with your deployment
 """
 from flask import Flask, request, Response
@@ -31,7 +31,8 @@ except Exception as e:
 @app.route('/webhook/sms', methods=['POST'])
 def handle_sms_webhook():
     """
-    Handle incoming SMS messages from Twilio
+    Handle incoming WhatsApp messages from Twilio
+    Note: Endpoint is named 'sms' for backward compatibility, but handles WhatsApp messages
     """
     if not all([twilio_service, openai_service, conversation_store]):
         return Response("Service not configured", status=500)

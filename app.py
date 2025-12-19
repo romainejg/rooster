@@ -1,6 +1,6 @@
 """
-Streamlit Bible Verse SMS Application
-Daily Bible verse scheduler with SMS delivery and Q&A via OpenAI + Twilio
+Streamlit Bible Verse WhatsApp Application
+Daily Bible verse scheduler with WhatsApp delivery and Q&A via OpenAI + Twilio
 """
 import streamlit as st
 import os
@@ -18,7 +18,7 @@ load_dotenv()
 
 # Page configuration
 st.set_page_config(
-    page_title="Daily Bible Verse SMS",
+    page_title="Daily Bible Verse WhatsApp",
     page_icon="📖",
     layout="wide"
 )
@@ -41,8 +41,8 @@ def init_services():
 bible_service, openai_service, twilio_service, conversation_store = init_services()
 
 # Title and description
-st.title("📖 Daily Bible Verse SMS")
-st.markdown("Send formatted Bible verses via SMS with OpenAI-generated reflections. Reply to SMS for Q&A in your church's doctrinal perspective.")
+st.title("📖 Daily Bible Verse WhatsApp")
+st.markdown("Send formatted Bible verses via WhatsApp with OpenAI-generated reflections. Reply to WhatsApp messages for Q&A in your church's doctrinal perspective.")
 
 # Sidebar for configuration
 with st.sidebar:
@@ -64,10 +64,10 @@ with st.sidebar:
     default_recipient = os.getenv('RECIPIENT_PHONE_NUMBER', saved_recipient or '')
     
     recipient_number = st.text_input(
-        "Recipient Phone Number",
+        "Recipient WhatsApp Number",
         value=default_recipient,
         placeholder="+1234567890",
-        help="Phone number to send Bible verses to"
+        help="WhatsApp number to send Bible verses to (will be auto-formatted as whatsapp:+1234567890)"
     )
     
     # Save recipient number when it changes (only if non-empty and different)
@@ -80,8 +80,8 @@ with st.sidebar:
     This app allows you to:
     - Select Bible verses
     - Format with AI reflections
-    - Send via Twilio SMS
-    - Answer questions via SMS
+    - Send via Twilio WhatsApp
+    - Answer questions via WhatsApp
     """)
 
 # Check if services are initialized
@@ -171,23 +171,23 @@ with tab1:
         # Character count
         char_count = len(st.session_state.preview_message)
         if char_count > 160:
-            st.warning(f"⚠️ Message is {char_count} characters (will be sent as {(char_count // 160) + 1} SMS messages)")
+            st.warning(f"⚠️ Message is {char_count} characters (will be sent as {(char_count // 160) + 1} WhatsApp messages)")
         else:
-            st.success(f"✅ Message is {char_count} characters (single SMS)")
+            st.success(f"✅ Message is {char_count} characters (single WhatsApp message)")
         
         # Send button
-        if st.button("📤 Send SMS Now", type="primary", use_container_width=True):
+        if st.button("📤 Send WhatsApp Now", type="primary", use_container_width=True):
             if not recipient_number:
-                st.error("Please enter a recipient phone number in the sidebar")
+                st.error("Please enter a recipient WhatsApp number in the sidebar")
             else:
-                with st.spinner("Sending SMS..."):
+                with st.spinner("Sending WhatsApp message..."):
                     result = twilio_service.send_sms(
                         st.session_state.preview_message,
                         recipient_number
                     )
                     
                     if result['status'] == 'success':
-                        st.success(f"✅ SMS sent successfully! Message SID: {result['message_sid']}")
+                        st.success(f"✅ WhatsApp message sent successfully! Message SID: {result['message_sid']}")
                         
                         # Store in conversation history
                         conversation_store.add_message(
@@ -197,7 +197,7 @@ with tab1:
                             message_sid=result['message_sid']
                         )
                     else:
-                        st.error(f"❌ Failed to send SMS: {result.get('error', 'Unknown error')}")
+                        st.error(f"❌ Failed to send WhatsApp message: {result.get('error', 'Unknown error')}")
 
 # Tab 2: Schedule Messages
 with tab2:
@@ -272,7 +272,7 @@ with tab2:
 
 # Tab 3: Conversation History
 with tab3:
-    st.header("💬 SMS Conversation History")
+    st.header("💬 WhatsApp Conversation History")
     
     if recipient_number:
         history = conversation_store.get_conversation_history(recipient_number, limit=20)
@@ -284,7 +284,7 @@ with tab3:
                 if msg['direction'] == 'outgoing':
                     st.markdown(f"""
                     <div style='background-color: #e3f2fd; padding: 10px; border-radius: 10px; margin: 5px 0;'>
-                        <strong>You (SMS Sent)</strong><br/>
+                        <strong>You (WhatsApp Sent)</strong><br/>
                         {msg['message']}<br/>
                         <small>{msg['timestamp']}</small>
                     </div>
@@ -300,12 +300,12 @@ with tab3:
         else:
             st.info("No conversation history yet. Send a verse to get started!")
     else:
-        st.warning("Please enter a recipient phone number in the sidebar to view conversation history.")
+        st.warning("Please enter a recipient WhatsApp number in the sidebar to view conversation history.")
     
     # Manual Q&A testing
     st.markdown("---")
     st.subheader("🧪 Test Q&A Response")
-    st.markdown("Test how the AI would respond to a question (without sending SMS)")
+    st.markdown("Test how the AI would respond to a question (without sending WhatsApp message)")
     
     test_question = st.text_area("Enter a test question:", placeholder="What does the Bible say about forgiveness?")
     
@@ -339,9 +339,11 @@ with tab4:
     # Twilio
     TWILIO_ACCOUNT_SID=your_account_sid
     TWILIO_AUTH_TOKEN=your_auth_token
+    # WhatsApp-enabled Twilio number (auto-formatted for WhatsApp)
     TWILIO_PHONE_NUMBER=+1234567890
     
     # Configuration
+    # Recipient WhatsApp number (auto-formatted for WhatsApp)
     RECIPIENT_PHONE_NUMBER=+1234567890
     CHURCH_DOCTRINE=Your church's doctrinal perspective
     BIBLE_API_KEY=your_api_bible_key  # Optional
@@ -357,9 +359,9 @@ with tab4:
     streamlit run app.py
     ```
     
-    #### 4. Setup Twilio Webhook (for SMS Replies)
+    #### 4. Setup Twilio WhatsApp Webhook
     
-    For SMS Q&A to work, you need to expose the webhook endpoint:
+    For WhatsApp Q&A to work, you need to expose the webhook endpoint:
     
     **Option A: Local Development (using ngrok)**
     ```bash
@@ -370,13 +372,15 @@ with tab4:
     ngrok http 5000
     ```
     
-    Then configure your Twilio phone number's messaging webhook to:
-    `https://your-ngrok-url.ngrok.io/webhook/sms`
+    Then configure your Twilio WhatsApp webhook:
+    - For sandbox: Messaging → WhatsApp Sandbox Settings
+    - For production: Messaging → WhatsApp Senders → [Your Number]
+    - Set webhook URL to: `https://your-ngrok-url.ngrok.io/webhook/sms`
     
     **Option B: Deploy on Cloud Platform**
     - Deploy `webhook_handler.py` separately as a web service
     - Use platforms like: Railway, Render, Heroku, or AWS Lambda
-    - Set the webhook URL in your Twilio phone number settings
+    - Set the webhook URL in your Twilio WhatsApp settings
     
     #### 5. Deploy Streamlit App
     
@@ -395,23 +399,24 @@ with tab4:
     ### 📚 API Keys Required
     
     1. **OpenAI API Key**: Get from https://platform.openai.com/api-keys
-    2. **Twilio Account**: Sign up at https://www.twilio.com/
+    2. **Twilio Account with WhatsApp**: Sign up at https://www.twilio.com/ and enable WhatsApp
     3. **Bible API Key** (Optional): Get from https://scripture.api.bible/
     
     ### 🔧 Features
     
-    ✅ Select and send Bible verses via SMS  
+    ✅ Select and send Bible verses via WhatsApp  
     ✅ AI-generated reflections with OpenAI  
     ✅ Schedule daily verse delivery  
-    ✅ Two-way SMS conversation with AI Q&A  
+    ✅ Two-way WhatsApp conversation with AI Q&A  
     ✅ Doctrinal perspective customization  
     ✅ Conversation history tracking  
     
     ### 📝 Notes
     
     - **Scheduling**: The schedule feature requires a background process. For production, use a cron job or cloud scheduler.
-    - **SMS Costs**: Check Twilio pricing for SMS costs
+    - **WhatsApp Costs**: Check Twilio pricing for WhatsApp messaging costs
     - **Rate Limits**: Be aware of OpenAI API rate limits
+    - **Phone Numbers**: Numbers are automatically formatted for WhatsApp (e.g., +1234567890 → whatsapp:+1234567890)
     """)
     
     st.markdown("---")

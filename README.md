@@ -1,16 +1,16 @@
-# 🐓 Rooster - Daily Bible Verse SMS App
+# 🐓 Rooster - Daily Bible Verse WhatsApp App
 
-A Streamlit-based application that sends daily Bible verses via Twilio SMS with AI-generated reflections powered by OpenAI. Features two-way SMS communication for answering Bible questions from your church's doctrinal perspective.
+A Streamlit-based application that sends daily Bible verses via Twilio WhatsApp with AI-generated reflections powered by OpenAI. Features two-way WhatsApp communication for answering Bible questions from your church's doctrinal perspective.
 
 ## ✨ Features
 
 - 📖 **Bible Verse Selection**: Choose any book, chapter, and verse range
 - 🤖 **AI Reflections**: OpenAI generates brief, meaningful reflections on selected verses
-- 📱 **SMS Delivery**: Send formatted verses via Twilio SMS
+- 📱 **WhatsApp Delivery**: Send formatted verses via Twilio WhatsApp
 - 📅 **Scheduling**: Schedule daily verse delivery at specific times
-- 💬 **Two-Way Q&A**: Reply to SMS messages and get AI-powered answers
+- 💬 **Two-Way Q&A**: Reply to WhatsApp messages and get AI-powered answers
 - 🏛️ **Doctrinal Context**: AI answers reflect your church's theological perspective
-- 📊 **Conversation History**: Track all SMS conversations and sent verses
+- 📊 **Conversation History**: Track all WhatsApp conversations and sent verses
 - 💾 **Persistent Memory**: App remembers your selections and preferences across sessions
 
 ## 🚀 Quick Start
@@ -19,7 +19,7 @@ A Streamlit-based application that sends daily Bible verses via Twilio SMS with 
 
 - Python 3.8+
 - OpenAI API account
-- Twilio account with SMS-enabled phone number
+- Twilio account with WhatsApp-enabled number
 - (Optional) Bible API key from api.bible
 
 ### Installation
@@ -50,9 +50,11 @@ OPENAI_API_KEY=sk-your-openai-api-key
 # Twilio Configuration
 TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxx
 TWILIO_AUTH_TOKEN=your_auth_token
+# Your WhatsApp-enabled Twilio number (numbers will be auto-formatted for WhatsApp)
 TWILIO_PHONE_NUMBER=+1234567890
 
 # Application Configuration
+# Recipient WhatsApp number (numbers will be auto-formatted for WhatsApp)
 RECIPIENT_PHONE_NUMBER=+1234567890
 CHURCH_DOCTRINE=Protestant Christian perspective with emphasis on grace, faith, and scripture
 
@@ -67,9 +69,9 @@ streamlit run app.py
 
 The app will open in your browser at `http://localhost:8501`
 
-## 🔧 Setting Up SMS Webhooks
+## 🔧 Setting Up WhatsApp Webhooks
 
-To enable two-way SMS conversations (replying to messages), you need to set up the webhook handler:
+To enable two-way WhatsApp conversations (replying to messages), you need to set up the webhook handler:
 
 ### Development Setup (Using ngrok)
 
@@ -83,15 +85,27 @@ python webhook_handler.py
 ngrok http 5000
 ```
 
-3. **Configure Twilio**
+3. **Configure Twilio WhatsApp Sandbox (Development)**
 - Go to your Twilio Console
-- Navigate to Phone Numbers → Active Numbers
-- Select your Twilio phone number
-- Under "Messaging", set the webhook URL to:
-  ```
-  https://your-ngrok-url.ngrok.io/webhook/sms
-  ```
-- Save changes
+- Navigate to Messaging → Try it out → Send a WhatsApp message
+- Follow instructions to join your WhatsApp sandbox
+- Once in sandbox, configure the webhook:
+  - Go to Messaging → Settings → WhatsApp Sandbox Settings
+  - Set "When a message comes in" webhook URL to:
+    ```
+    https://your-ngrok-url.ngrok.io/webhook/sms
+    ```
+  - Save changes
+
+4. **Configure Twilio WhatsApp (Production)**
+- After activating your WhatsApp Business account with Twilio:
+  - Go to Messaging → Senders → WhatsApp senders
+  - Select your WhatsApp number
+  - Set the webhook URL to:
+    ```
+    https://your-production-url.com/webhook/sms
+    ```
+  - Save changes
 
 ### Production Setup
 
@@ -126,7 +140,7 @@ Then update your Twilio webhook URL to your production URL.
 2. Select book, chapter, and verse range
 3. Check "Include AI-generated reflection" for a devotional message
 4. Click **"Preview Message"** to see the formatted message
-5. Click **"Send SMS Now"** to send via Twilio
+5. Click **"Send WhatsApp Now"** to send via Twilio WhatsApp
 
 ### Schedule Daily Verses
 
@@ -148,6 +162,8 @@ Then update your Twilio webhook URL to your production URL.
 1. Enter recipient phone number in the sidebar
 2. View service configuration status
 3. Check the **"Setup"** tab for deployment instructions
+
+**Note:** Phone numbers are automatically formatted for WhatsApp (e.g., `+1234567890` becomes `whatsapp:+1234567890`)
 
 ## 🌐 Deployment Options
 
@@ -195,7 +211,8 @@ For production, you can combine the Streamlit app and webhook in a single deploy
 - Maintains conversation context
 
 ### Twilio Service (`twilio_service.py`)
-- Sends SMS messages
+- Sends WhatsApp messages
+- Automatically formats phone numbers for WhatsApp
 - Creates webhook responses
 - Parses incoming messages
 
@@ -278,7 +295,8 @@ This project is open source and available under the MIT License.
 For issues or questions:
 - Open an issue on GitHub
 - Check the Setup tab in the application
-- Review Twilio and OpenAI documentation
+- Review Twilio WhatsApp and OpenAI documentation
+- See [Twilio WhatsApp documentation](https://www.twilio.com/docs/whatsapp)
 
 ---
 
