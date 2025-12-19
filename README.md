@@ -11,6 +11,7 @@ A Streamlit-based application that sends daily Bible verses via Twilio SMS with 
 - 💬 **Two-Way Q&A**: Reply to SMS messages and get AI-powered answers
 - 🏛️ **Doctrinal Context**: AI answers reflect your church's theological perspective
 - 📊 **Conversation History**: Track all SMS conversations and sent verses
+- 💾 **Persistent Memory**: App remembers your selections and preferences across sessions
 
 ## 🚀 Quick Start
 
