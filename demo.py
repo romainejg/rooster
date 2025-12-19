@@ -101,7 +101,12 @@ def demo_conversation_store():
     # Retrieve state
     saved_selection = store.get_verse_selection()
     saved_recipient = store.get_recipient_number()
-    print(f"   ✅ State saved: {saved_selection['book']} {saved_selection['chapter']}:{saved_selection['start_verse']}")
+    
+    # Display saved state (handle None values)
+    book = saved_selection.get('book') or 'N/A'
+    chapter = saved_selection.get('chapter', 0)
+    start_verse = saved_selection.get('start_verse', 0)
+    print(f"   ✅ State saved: {book} {chapter}:{start_verse}")
     print(f"   ✅ Recipient saved: {saved_recipient}")
     print(f"   ℹ️  State persists across app restarts!")
     

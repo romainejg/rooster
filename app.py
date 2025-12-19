@@ -70,8 +70,8 @@ with st.sidebar:
         help="Phone number to send Bible verses to"
     )
     
-    # Save recipient number when it changes
-    if recipient_number and conversation_store and recipient_number != saved_recipient:
+    # Save recipient number when it changes (only if non-empty and different)
+    if recipient_number and conversation_store and recipient_number != saved_recipient and recipient_number != default_recipient:
         conversation_store.save_recipient_number(recipient_number)
     
     st.markdown("---")

@@ -281,11 +281,16 @@ class ConversationStore:
         Returns:
             Dictionary with last verse selection or defaults
         """
+        # Get values with defaults to avoid None
+        chapter_str = self.get_state('last_chapter', '3')
+        start_str = self.get_state('last_start_verse', '16')
+        end_str = self.get_state('last_end_verse', '16')
+        
         return {
             'book': self.get_state('last_book'),
-            'chapter': int(self.get_state('last_chapter', '3')),
-            'start_verse': int(self.get_state('last_start_verse', '16')),
-            'end_verse': int(self.get_state('last_end_verse', '16')),
+            'chapter': int(chapter_str) if chapter_str else 3,
+            'start_verse': int(start_str) if start_str else 16,
+            'end_verse': int(end_str) if end_str else 16,
             'preview_message': self.get_state('preview_message'),
             'current_verse_ref': self.get_state('current_verse_ref')
         }
