@@ -205,7 +205,7 @@ with tab1:
         <div class='verse-box'>
             <h3 style='margin-top: 0;'>{st.session_state.get('current_verse_ref', 'Scripture')}</h3>
             <div style='font-size: 1.1em; line-height: 1.6;'>
-                {st.session_state.preview_message.replace(chr(10), '<br/>')}
+                {st.session_state.preview_message.replace('\n', '<br/>')}
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -237,7 +237,7 @@ with tab1:
             <div class='qa-box'>
                 <h4 style='color: #8B6914; margin-top: 0;'>📜 Answer:</h4>
                 <div style='line-height: 1.6;'>
-                    {answer.replace(chr(10), '<br/>')}
+                    {answer.replace('\n', '<br/>')}
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -276,15 +276,12 @@ with tab2:
             submitted = st.form_submit_button("➕ Add to Plan", type="primary", use_container_width=True)
             
             if submitted:
-                # Add a dummy recipient since we're not sending
-                conversation_store.add_scheduled_message(
+                conversation_store.add_reading_plan_item(
                     book=plan_book,
                     chapter=plan_chapter,
                     start_verse=plan_start,
                     end_verse=plan_end,
-                    schedule_time="00:00",  # Dummy time since we're not scheduling
-                    include_reflection=plan_reflection,
-                    recipient_number="reading_plan"  # Dummy recipient
+                    include_reflection=plan_reflection
                 )
                 st.success(f"✅ Added {plan_book} {plan_chapter}:{plan_start}-{plan_end} to your reading plan!")
                 st.rerun()

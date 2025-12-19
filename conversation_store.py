@@ -153,6 +153,30 @@ class ConversationStore:
         conn.commit()
         conn.close()
     
+    def add_reading_plan_item(self, book: str, chapter: int, start_verse: int, 
+                            end_verse: int, include_reflection: bool):
+        """
+        Add an item to the reading plan (uses scheduled_messages table for storage)
+        
+        Args:
+            book: Bible book name
+            chapter: Chapter number
+            start_verse: Starting verse number
+            end_verse: Ending verse number
+            include_reflection: Whether to include AI reflection
+        """
+        # Use the existing scheduled_messages table with dummy values for time/recipient
+        # since we're repurposing it as a reading plan
+        self.add_scheduled_message(
+            book=book,
+            chapter=chapter,
+            start_verse=start_verse,
+            end_verse=end_verse,
+            schedule_time="00:00",  # Not used for reading plans
+            include_reflection=include_reflection,
+            recipient_number="reading_plan"  # Marker for reading plan items
+        )
+    
     def get_pending_scheduled_messages(self) -> List[Dict]:
         """Get all pending scheduled messages"""
         conn = sqlite3.connect(self.db_path)
